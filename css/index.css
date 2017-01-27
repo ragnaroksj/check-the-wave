@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+    margin: 10px 0;
+    border-bottom: 1px solid #fff;
+}
+
+li span {
+    display: inline-block;
+    width: 20%;
+}
+
+.filter {
+    background: #F5F5F6;
+    width: 15%;
+    float: left;
+    margin: 1rem;
+}
+
+#weekType {
+    margin-right: 10px;
+    margin-left: 1rem;
+}
+
+.content {
+    float: left;
+    width: 70%;
+    padding: 1.5rem 0 0 3rem;
+}
+
+.filter li {
+    padding: 1rem 0;
+}
+
+.filter li div {
+    margin-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.weekends {
+    color: red;
+}
+
+.hide {
+    display: none;
+}
+
+select {
+    width: 100%;
+    height: 300px;
+    background: transparent;
+    border: none;
+}
+
+select:focus {
+    outline: none;
+}
+
+option {
+    padding: 0.5rem 1rem;
+    border: 1px solid #fff;
+    font-size: 1rem;
+    border-left: 0;
+    border-right: 0;
+}
+
+.updateDate {
+    background: #000;
+    color: #049FD9;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    font-family: arial;
+    padding: 1rem;
+}
+
+.item {
+    padding: 0.2rem 0;
+}
