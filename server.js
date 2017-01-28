@@ -10,23 +10,27 @@ var xoauth2 = require('xoauth2');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname));
 
+
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip = process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
+    url = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=1',
+    collection = [],
+    dayText = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+var smtpTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    xoauth2: xoauth2.createXOAuth2Generator({
+      user: 'ragnarokmj@gmail.com',
+      clientId: '459460394137-ad80c4ujol0g2r5h2aeolt9eppjjv5cm.apps.googleusercontent.com',
+      clientSecret: 'voNnEoW0YD_vhcDyZh8ChyLd',
+      refreshToken: '1/2F7JITXerJOCiFn0oCXVj3sZrJAPkWmZF35cPYbY8HZZpInBvmWl_kXrpZCkAz1Q',
+      accessToken: 'ya29.GlvgA--MOTQJAfr6QMEY7EPhlWPMIqNd8XyEPDCIuNvz4bxDORAtYmzqzuNLKRWViOzgx8FYDoHZZlWKHWBwaA0iP6KlrkLMQk-AtjRcYh_6CTV3hsJud7DPi2Mr',
+    })
+  }
+});
+
 app.get('/scrape', function(req, res){
-  url = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=1';
-  var collection = [];
-  var dayText = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var smtpTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      xoauth2: xoauth2.createXOAuth2Generator({
-        user: 'ragnarokmj@gmail.com',
-        clientId: '459460394137-ad80c4ujol0g2r5h2aeolt9eppjjv5cm.apps.googleusercontent.com',
-        clientSecret: 'voNnEoW0YD_vhcDyZh8ChyLd',
-        refreshToken: '1/2F7JITXerJOCiFn0oCXVj3sZrJAPkWmZF35cPYbY8HZZpInBvmWl_kXrpZCkAz1Q',
-        accessToken: 'ya29.GlvgA--MOTQJAfr6QMEY7EPhlWPMIqNd8XyEPDCIuNvz4bxDORAtYmzqzuNLKRWViOzgx8FYDoHZZlWKHWBwaA0iP6KlrkLMQk-AtjRcYh_6CTV3hsJud7DPi2Mr',
-      })
-    }
-  });
-  
   request(url, function(error, response, html){
     if(!error){
       var $ = cheerio.load(html);
@@ -79,6 +83,6 @@ app.get('/scrape', function(req, res){
   });
 })*/
 
-app.listen('8990')
-console.log('Magic happens on port 8990');
+app.listen(port, ip);
+console.log('Server running on http://%s:%s', ip, port);
 exports = module.exports = app;
