@@ -9,10 +9,12 @@
     "url": "https://github.com/scotch-io/node-web-scraper"
   },
   "dependencies": {
+    "body-parser": "^1.16.0",
     "cheerio": "latest",
     "cron": "^1.2.1",
     "ejs": "^2.5.5",
     "express": "latest",
+    "mongodb": "^2.2.22",
     "nodemailer": "^2.7.2",
     "request": "latest",
     "xoauth2": "^1.2.0"

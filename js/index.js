@@ -1,9 +1,3 @@
-window.onload = function() {
-    setTimeout(() =>{
-        window.location.reload(true);
-    }, 3600000);
-}
-
 function getSelectValues(select) {
   var result = [];
   var options = select && select.options;
@@ -17,6 +11,22 @@ function getSelectValues(select) {
     }
   }
   return result;
+}
+
+function register() {
+    document.getElementById("register").addEventListener('click', function() {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if(xmlhttp.readyState === XMLHttpRequest.DONE && xmlhttp.status === 200){
+                console.log('data', xmlhttp.responseText);
+            }
+        };
+        xmlhttp.open('POST', '/register');
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(JSON.stringify({
+            email: document.getElementById("email").value
+        }));
+    });
 }
 
 function itemFilter(elm) {
@@ -47,3 +57,10 @@ function itemFilter(elm) {
     }
 }
 
+window.onload = function() {
+    register();
+    
+    setTimeout(() =>{
+        window.location.reload(true);
+    }, 30000);
+}

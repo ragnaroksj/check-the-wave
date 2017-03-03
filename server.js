@@ -5,16 +5,19 @@ var cheerio = require('cheerio');
 var app     = express();
 var nodemailer = require('nodemailer');
 var xoauth2 = require('xoauth2');
-
+var bodyParser = require('body-parser');
+var DB = require('./db').DB;
+var assert = require('assert');
 
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname));
+app.use(bodyParser());
 
+var docName = 'register';
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip = process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
     url = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=1',
-    collection = [],
     dayText = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 var smtpTransporter = nodemailer.createTransport({
@@ -31,18 +34,19 @@ var smtpTransporter = nodemailer.createTransport({
 });
 
 app.get('/scrape', function(req, res){
+  var collection = [];
+  var emailCollection = [];
+  var mailOptions = {
+    from: 'ragnaroksj@gmail.com',
+    subject: 'Reminder',
+    text: 'New positions are avaiable!'
+  };
+
   request(url, function(error, response, html){
     if(!error){
       var $ = cheerio.load(html);
       var calendaravailable = $('#content .calendaravailable');
       var htmlTemplate = '<ul>';
-
-      var mailOptions = {
-        from: 'ragnaroksj@gmail.com',
-        to: 'ragnaroksj@gmail.com',
-        subject: 'test',
-        text: 'New position are avaiable!'
-      };
 
       calendaravailable.each(function(index, element){
         var item = {date : "",day: "", number : "", requestLink: "", isWeekends:""};
@@ -59,21 +63,45 @@ app.get('/scrape', function(req, res){
 
       res.render('index',{ collection: collection, updateDate: new Date()});
 
-      if( calendaravailable.length > 0 ) {
-        mailOptions.html = htmlTemplate;
-        smtpTransporter.sendMail(mailOptions, function(error, response){
-          if(error) {
-            console.log(error);
-          } else {
-            console.log('message sent', response);
+      DB(docName, function(db, collection) {
+        collection.find({}).toArray(function(err, docs) {
+          assert.equal(err, null);
+          docs.map(function(item, index){
+            emailCollection.push(item.email);
+          });
+
+          mailOptions.to = emailCollection;
+
+          if( calendaravailable.length > 0 ) {
+            mailOptions.html = htmlTemplate;
+            smtpTransporter.sendMail(mailOptions, function(error, response){
+              if(error) {
+                console.log(error);
+              } else {
+                console.log('message sent', response);
+              }
+
+              smtpTransporter.close();
+            });
           }
 
-          smtpTransporter.close();
         });
-      }
+      });
     }
   })
 })
+
+app.post('/register', function(req, res){
+  DB(docName, function(db, collection) {
+    collection.insertOne({email: req.body.email}, function(err, result){
+        assert.equal(err, null);
+        assert.equal(1, result.result.n);
+        assert.equal(1, result.ops.length);
+        db.close();
+        res.send('ok');
+    }); 
+  });
+});
 
 /*app.get('/book', function(req, res){
   request.post({url: 'https://www.blm.gov/az/paria/backcountryapp.cfm?AreaID=1&RequestedDate=2/9/2017', form: {watchvideo: "1", "AROLPSpa": "I Agree"}},function(err, httpResponse, body){
