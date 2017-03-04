@@ -18,7 +18,7 @@ var docName = 'register';
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip = process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
     urlNorth = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=2',
-    urlSouth = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=2',
+    urlSouth = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=1',
     dayText = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 var smtpTransporter = nodemailer.createTransport({
