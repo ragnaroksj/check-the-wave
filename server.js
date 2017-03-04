@@ -17,7 +17,8 @@ var docName = 'register';
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip = process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    url = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=1',
+    urlNorth = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=2',
+    urlSouth = 'https://www.blm.gov/az/paria/hikingcalendar.cfm?areaid=2',
     dayText = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 var smtpTransporter = nodemailer.createTransport({
@@ -33,16 +34,74 @@ var smtpTransporter = nodemailer.createTransport({
   }
 });
 
-app.get('/scrape', function(req, res) {
+app.get('/north', function(req, res) {
   var collection = [];
   var emailCollection = [];
   var mailOptions = {
     from: 'ragnaroksj@gmail.com',
-    subject: 'Reminder',
+    subject: 'Reminder North',
     text: 'New positions are avaiable!'
   };
 
-  request(url, function(error, response, html) {
+  request(urlNorth, function(error, response, html) {
+    if(!error){
+      var $ = cheerio.load(html);
+      var calendaravailable = $('#content .calendaravailable');
+      var htmlTemplate = '<ul>';
+
+      calendaravailable.each(function(index, element) {
+        var item = {date : "",day: "", number : "", requestLink: "", isWeekends:""};
+        item.requestLink = $(this).find('a').attr('href');
+        item.number = $(this).find('.calendar a').text();
+        item.date = item.requestLink.split("RequestedDate=")[1];
+        var d = new Date(item.date);
+        item.day = dayText[d.getDay()];
+        item.isWeekends = (d.getDay() === 0 || d.getDay() === 6) ? 'weekends' : 'weekdays';
+        htmlTemplate += '<li>'+ item.date + '    ' + item.day + '    ' + item.number + '    ' +'<a href="'+ item.requestLink + '">Book</a>' + '</li>';
+        collection.push(item);
+      });
+      htmlTemplate += '</ul>';
+
+      res.render('index',{ collection: collection, updateDate: new Date()});
+
+      DB(docName, function(db, collection) {
+        collection.find({}).toArray(function(err, docs) {
+          assert.equal(err, null);
+          docs.map(function(item, index){
+            emailCollection.push(item.email);
+          });
+
+          mailOptions.to = emailCollection;
+
+          if( calendaravailable.length > 0 ) {
+            mailOptions.html = htmlTemplate;
+            smtpTransporter.sendMail(mailOptions, function(error, response){
+              if(error) {
+                console.log(error);
+              } else {
+                console.log('message sent', response);
+              }
+
+              smtpTransporter.close();
+            });
+          }
+
+        });
+      });
+    }
+  })
+})
+
+app.get('/south', function(req, res) {
+  var collection = [];
+  var emailCollection = [];
+  var mailOptions = {
+    from: 'ragnaroksj@gmail.com',
+    subject: 'Reminder South',
+    text: 'New positions are avaiable!'
+  };
+
+  request(urlSouth, function(error, response, html) {
     if(!error){
       var $ = cheerio.load(html);
       var calendaravailable = $('#content .calendaravailable');
