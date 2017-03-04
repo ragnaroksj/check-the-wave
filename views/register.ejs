@@ -1,0 +1,24 @@
+<html lang="en">
+    <head>
+        <meta charset="UTG-8">
+        <title>Register page</title>
+        <link rel="stylesheet" type="text/css" href="/css/index.css" />
+        <script type="text/javascript" src="/js/register.js"></script>
+    </head>
+    <body>
+        <div class="user-configuration">
+            <input type="text" name="email" placeholder="email" id="email" />
+            <input type="button" value="register" id="register" />
+        </div>
+        <div class="content">
+            <ul>
+            <% emailListItem.forEach(function(item) { %>
+                <li class="item email-list">
+                    <span><%= item %></span>
+                    <span><a onclick="del('<%= item %>')" href="#" >del</a></span>
+                </li>
+            <% }) %>
+            </ul>
+        </div>
+    </body>
+</html>

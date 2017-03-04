@@ -33,7 +33,7 @@ var smtpTransporter = nodemailer.createTransport({
   }
 });
 
-app.get('/scrape', function(req, res){
+app.get('/scrape', function(req, res) {
   var collection = [];
   var emailCollection = [];
   var mailOptions = {
@@ -42,13 +42,13 @@ app.get('/scrape', function(req, res){
     text: 'New positions are avaiable!'
   };
 
-  request(url, function(error, response, html){
+  request(url, function(error, response, html) {
     if(!error){
       var $ = cheerio.load(html);
       var calendaravailable = $('#content .calendaravailable');
       var htmlTemplate = '<ul>';
 
-      calendaravailable.each(function(index, element){
+      calendaravailable.each(function(index, element) {
         var item = {date : "",day: "", number : "", requestLink: "", isWeekends:""};
         item.requestLink = $(this).find('a').attr('href');
         item.number = $(this).find('.calendar a').text();
@@ -91,9 +91,9 @@ app.get('/scrape', function(req, res){
   })
 })
 
-app.post('/register', function(req, res){
+app.post('/register-ragnaroksj-wavechecker', function(req, res) {
   DB(docName, function(db, collection) {
-    collection.insertOne({email: req.body.email}, function(err, result){
+    collection.insertOne({email: req.body.email}, function(err, result) {
         assert.equal(err, null);
         assert.equal(1, result.result.n);
         assert.equal(1, result.ops.length);
@@ -103,13 +103,29 @@ app.post('/register', function(req, res){
   });
 });
 
-/*app.get('/book', function(req, res){
-  request.post({url: 'https://www.blm.gov/az/paria/backcountryapp.cfm?AreaID=1&RequestedDate=2/9/2017', form: {watchvideo: "1", "AROLPSpa": "I Agree"}},function(err, httpResponse, body){
-    res.render('book', function(err, html){
-      res.send(httpResponse.body);
+app.get('/register-ragnaroksj-page', function(req, res) {
+  var emailListItem = [];
+  DB(docName, function(db, collection) {
+    collection.find({}).toArray(function(err, docs) {
+      assert.equal(err, null);
+      docs.map(function(item){
+        emailListItem.push(item.email);
+      });
+
+      res.render('register', {emailListItem: emailListItem});
+      db.close();
     });
   });
-})*/
+});
+
+app.post('/delete-ragnaroksj-wavechecker', function(req, res) {
+  DB(docName, function(db, collection) {
+    collection.deleteOne({email: req.body.email}, function(err, docs) {
+      assert.equal(err, null);
+      db.close();
+    });
+  })
+});
 
 app.listen(port, ip);
 console.log('Server running on http://%s:%s', ip, port);
