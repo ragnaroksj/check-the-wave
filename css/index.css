@@ -84,3 +84,34 @@ option {
 .item {
     padding: 0.2rem 0;
 }
+
+.nav, .inspect-frequency  {
+    display: inline-block;
+    padding: 1em;
+}
+
+#type {
+    padding: 1em;
+    text-transform: capitalize;
+    background: #ccc;
+}
+
+.stop-frequency, .cont-frequency {
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    background: #eee;
+    color: red;
+    cursor: pointer;
+}
+
+.stop-frequency-disabled, .cont-frequency-disabled {
+    color: #999;
+    background: #eee;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+}
+
+.stop-frequency:hover, .cont-frequency:hover {
+    background: red;
+    color: #eee;
+}

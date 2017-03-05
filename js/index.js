@@ -42,8 +42,58 @@ function itemFilter(elm) {
 }
 
 window.onload = function() {
-    
-    setTimeout(() =>{
-        window.location.reload(true);
-    }, 30000);
+    var f = document.getElementById('aIF');
+    var sF = document.getElementById('stopRefresh');
+    var cF = document.getElementById('contRefresh');
+    var frequency = parseInt((f.value));
+    var autoReload;
+    if (!isNaN(frequency) && frequency !== 0) {
+        autoReload = setTimeout(() =>{
+            window.location.href = window.location.origin + '/' + document.getElementById('type').dataset.type + '/' + frequency;
+        }, frequency * 1000);
+    }
+
+    f.addEventListener('change', function() {
+        var newFre = parseInt(this.value);
+        if (!isNaN(newFre)){
+            if (newFre === 0) {
+                clearTimeout(autoReload);
+            } else {
+                autoReload = setTimeout(() =>{
+                    window.location.href = window.location.origin + '/' + document.getElementById('type').dataset.type + '/' + newFre;
+                }, newFre * 1000);  
+            }
+        }
+    });
+
+    f.addEventListener('focus', function() {
+        clearTimeout(autoReload);
+    });
+
+    f.addEventListener('blur', function() {
+        var newFre = parseInt(this.value);
+        if (!isNaN(newFre)){
+            autoReload = setTimeout(() =>{
+                window.location.href = window.location.origin + '/' + document.getElementById('type').dataset.type + '/' + newFre;
+            }, newFre * 1000);  
+        }
+    });
+
+    sF.addEventListener('click', function() {
+        clearTimeout(autoReload);
+        this.className += '-disabled';
+        cF.className = 'nav cont-frequency';
+    });
+
+    cF.addEventListener('click', function() {
+        var newFre = parseInt(f.value);
+        if (!isNaN(newFre)){
+            autoReload = setTimeout(() =>{
+                window.location.href = window.location.origin + '/' + document.getElementById('type').dataset.type + '/' + newFre;
+            }, newFre * 1000);  
+        }
+        this.className += '-disabled';
+        sF.className = "nav stop-frequency";
+    });
+
 }

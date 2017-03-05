@@ -34,7 +34,7 @@ var smtpTransporter = nodemailer.createTransport({
   }
 });
 
-app.get('/north', function(req, res) {
+app.get('/north(/:freq)?', function(req, res) {
   var collection = [];
   var emailCollection = [];
   var mailOptions = {
@@ -42,6 +42,7 @@ app.get('/north', function(req, res) {
     subject: 'Reminder North',
     text: 'New positions are avaiable!'
   };
+  var freq = req.params.freq || 0; 
 
   request(urlNorth, function(error, response, html) {
     if(!error){
@@ -62,7 +63,7 @@ app.get('/north', function(req, res) {
       });
       htmlTemplate += '</ul>';
 
-      res.render('index',{ collection: collection, updateDate: new Date()});
+      res.render('index',{ collection: collection, updateDate: new Date(), freq: freq, type: 'north'});
 
       DB(docName, function(db, collection) {
         collection.find({}).toArray(function(err, docs) {
@@ -92,7 +93,7 @@ app.get('/north', function(req, res) {
   })
 })
 
-app.get('/south', function(req, res) {
+app.get('/south(/:freq)?', function(req, res) {
   var collection = [];
   var emailCollection = [];
   var mailOptions = {
@@ -100,6 +101,7 @@ app.get('/south', function(req, res) {
     subject: 'Reminder South',
     text: 'New positions are avaiable!'
   };
+  var freq = req.params.freq || 0; 
 
   request(urlSouth, function(error, response, html) {
     if(!error){
@@ -120,7 +122,7 @@ app.get('/south', function(req, res) {
       });
       htmlTemplate += '</ul>';
 
-      res.render('index',{ collection: collection, updateDate: new Date()});
+      res.render('index',{ collection: collection, updateDate: new Date(), freq: freq, type: 'south'});
 
       DB(docName, function(db, collection) {
         collection.find({}).toArray(function(err, docs) {
